@@ -1,5 +1,5 @@
 import { TestScheduler } from 'rxjs/testing';
-import { throttleTime } from 'rxjs';
+import { throttleTime,concatMap,delay,of } from 'rxjs';
 
 TestScheduler.frameTimeFactor= 1000;
 const testScheduler = new TestScheduler((actual, expected) => {
@@ -11,13 +11,16 @@ const testScheduler = new TestScheduler((actual, expected) => {
 
 // This test runs synchronously.
 testScheduler.run((helpers) => {
-  const { cold, time, animate } = helpers;
-  animate('              ---x---x---x---x');
+  const { cold, time, animate, expectObservable ,hot} = helpers;
+  animate('1s');
 
-  const e1 = cold(' -a--b--c--d-e-|');
+  const e1 = cold('a 1.5s b 9s c|');
   const t  = time('   ---|       '); // t = 3
-  const expected = '-a-----c---|';
 
   console.log('testing marbles ....');
-  e1.pipe(throttleTime(1000)).subscribe(v =>console.log(v));
+  let result = e1.pipe(throttleTime(2000))
+  
+  expectObservable(result).toBe('-');
+  console.log('xxx');
+  result.subscribe(v =>console.log(v));
 });
